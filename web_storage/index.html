@@ -30,7 +30,10 @@
   <div effect="fade"><pre>
   localStorage.foo = "FOO";
   localStorage['bar'] = "BAR";
-  localStorage.baz = {key: "baz", value: "BAZ"};
+
+  // Javascript オブジェクトは直接保存できない?
+  localStorage.baz = JSON.stringify({key: "baz", value: "BAZ"});
+  var baz = JSON.parse(localStorage.baz);
 
   for (var i=0; i&lt;localStorage.length; i++){
     var key = localStorage[i];
