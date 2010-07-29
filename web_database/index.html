@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Web SQL Database</title>
+  <meta name="author" content="kyanny">
+  <script type="text/javascript" src="lib/jquery.js"></script>
+  <script type="text/javascript" src="lib/nerine.js"></script>
+  <link rel="stylesheet" type="text/css" href="lib/nerine.css">
+  <link rel="stylesheet" type="text/css" href="cooldemo.css">
+</head><body>
+<article>
+
+<section>
+  <h1>Web SQL Database</h1>
+</section>
+
+<section>
+  <h2>Web SQL Database</h2>
+  <ul>
+    <li effect="fade">リレーショナルデータベース (SQLite)</li>
+    <li effect="fade">プレースホルダーもある (SQL Injection)</li>
+    <li effect="fade">実装は Safari, Chrome のみ</li>
+    <li effect="fade">昨年末頃に仕様策定が中止された</li>
+    <li effect="fade">手を出さないほうが良いかも... (FYI: Indexed Database API)</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Web SQL Database</h2>
+  <ul>
+    <li effect="fade">非同期 API (コールバックだらけ)</li>
+    <li effect="fade">openDatabase(dbname, version, description, size)</li>
+    <li effect="fade">db.transaction(callback, errorCallback, successCallback)</li>
+    <li effect="fade">tx.executeSql(sql, bind, callback)</li>
+    <li effect="fade">etc.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Code</h2>
+  <div effect="fade"><pre>
+  var db = openDatabase(dbname, version, description 1024*1024);
+  db.transaction(function(tx){
+    tx.executeSql(
+      "SELECT * FROM jojo WHERE name = ?", // sql
+      ['空条丈太郎'],                      // bind
+      function(tx,rs){                     // callback
+        var rows = rs.rows;
+        for (var i=0; i&lt;rows.length; i++){
+          var row = rows.item(i);
+          console.log(row.name); //=&gt; 空条丈太郎
+          console.log(row.stand_name); //=> スター・プラチナ
+        }
+      }
+    );
+  }, function(error){ // error
+  }, function(){ // success
+  });
+  </pre></div>
+</section>
+
+<section>
+  <h2>Problem</h2>
+  <ul>
+    <li effect="fade">書きづらい & 読みづらい</li>
+    <li effect="fade">O/R Mapper 欲しいよね (本当か?)</li>
+    <li effect="fade">もう作ってる人がいた</li>
+  </ul>
+</section>
+
+<section>
+  <h2>AlexRecord (O/R Mapper)</h2>
+  <ul>
+    <li effect="fade">http://d.hatena.ne.jp/Syunpei/20090728/1248751119</li>
+    <li effect="fade">白石俊平さん作 (HTML5勉強会の中のひと)</li>
+    <li effect="fade">ActiveRecord パターン</li>
+  </ul>
+</section>
+
+<section>
+  <h2>AlexRecord (Code 1)</h2>
+  <div effect="fade"><pre>
+  var Book = alex.record.Class({
+    tableName: "Book",
+    columns: [
+      {name: "title", type: "string"},
+      {name: "price", type: "integer"},
+      {name: "ISBN", type: "string"}
+    ]
+  });
+  </pre></div>
+</section>
+
+<section>
+  <h2>AlexRecord (Code 2)</h2>
+  <div effect="fade"><pre>
+  var book = new Book({
+    title: "HTML5&API入門",
+    isbn: "4822284220"
+  });
+  book.setPrice(2940);
+  book.save(function(result,error){
+  if (error){
+    console.log('error');
+  }
+  console.log('ok');
+  </pre></div>
+</section>
+
+<section>
+  <h2>jsdeferred-webdatabase (O/R Mapper)</h2>
+  <ul>
+    <li effect="fade">http://subtech.g.hatena.ne.jp/secondlife/20091008/1255003922</li>
+    <li effect="fade">id:secondlife 作 (最近はてなを退職したひと)</li>
+    <li effect="fade">ActiveRecord パターン + JSDeferred</li>
+    <li effect="fade">JSDeferred は、非同期処理を同期処理っぽく書けるライブラリ (id:cho45 作)</li>
+  </ul>
+  <div effect="fade"><pre>
+  parallel([
+    $.getJSON('/a.json'),
+    $.getJSON('/b.json'),
+    $.getJSON('/c.json'),
+  ]).next(function(results){
+    for (var i=0; i&lt;results.length; i++){
+      alert(results[i]);
+    }
+  });
+  </pre></div>
+</section>
+
+<section>
+  <h2>jsdeferred-webdatabase (Code 1)</h2>
+  <div effect="fade"><pre>
+  var Database = JSDeferred.WebDatabase;
+  db = new Database('dbname');
+
+  db.transaction(function(tx){
+    tx.execute(sql).next(callback).error(errorCallback);
+  }, true).next(finishCommitFunc).error(errorTransactionFunc);
+
+  db.transaction(function(tx){
+    tx.execute(sql)
+      .execute(sql)
+      .execute(sql)
+      .next(function(result){
+        alert(result)
+      });
+  });
+  </pre></div>
+</section>
+
+<section>
+  <h2>jsdeferred-webdatabase (Code 2)</h2>
+  <div effect="fade"><pre>
+  var Book = Model({
+    table: 'books',
+    primaryKeys: ['isbn'],
+    fields: {
+      isbn: 'INTEGER PRIMARY KEY',
+      title: 'TEXT'
+    }
+  }, db);
+
+  Book.createTable().next(function(){
+    var book = new Book({
+      name: 'HTML5&API入門'
+    });
+    book.isbn = "4822284220";
+    book.save().next(function(book){
+      book.isbn;
+    });
+  });
+  </pre></div>
+</section>
+
+<section>
+  <h2>まとめ</h2>
+  <ul>
+    <li effect="fade">ブラウザの実装が増えないことには...</li>
+    <li effect="fade">一般配布するソフトウェアとかにいいかも?</li>
+  </ul>
+</section>
+
+<section>
+  <h2>おまけ (Indexed Database API)</h2>
+  <ul>
+    <li effect="fade">キーにインデックスをはれる Web Storage みたいなもの</li>
+    <li effect="fade">キーを列挙しなくて良いのでたぶん検索がはやい</li>
+    <li effect="fade">Web Storage と Web SQL Database の間くらい</li>
+    <li effect="fade">最後発の仕様 (まだ実装してるブラウザはない)</li>
+    <li effect="fade">Microsoft と Mozilla が支持</li>
+  </ul>
+</section>
+
+<section class="last">
+  <p>以上</p>
+</section>
+
+</article>
+</body></html>

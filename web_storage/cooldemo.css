@@ -1,0 +1,34 @@
+@import url(lib/common-effect.petal.css);
+
+body {
+  background-color: #000;
+  color: #fff;
+}
+
+section {
+  background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#33333b));
+}
+
+h1 {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  margin: -0.5em 0 0 0;
+  padding: 0;
+  width: 100%;
+  text-shadow: 0 0 0.3em #fff;
+  text-align: center;
+  line-height: 1;
+}
+
+section.last p {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  margin: -0.5em 0 0 0;
+  padding: 0;
+  width: 100%;
+  text-shadow: 0 0 0.3em #fff;
+  text-align: center;
+  line-height: 1;
+}
