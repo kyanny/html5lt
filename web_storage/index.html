@@ -27,21 +27,19 @@
 
 <section>
   <h2>Code</h2>
-  <ul>
-    <li effect="fade"><pre>
-    localStorage.foo = "FOO";
-    localStorage['bar'] = "BAR";
-    localStorage.baz = {key: "baz", value: "BAZ"};
+  <div effect="fade"><pre>
+  localStorage.foo = "FOO";
+  localStorage['bar'] = "BAR";
+  localStorage.baz = {key: "baz", value: "BAZ"};
 
-    for (var i=0; i&lt;localStorage.length; i++){
-      var key = localStorage[i];
-      var value = localStorage.getItem(key);
-      localStorage.removeItem(key);
-    }
+  for (var i=0; i&lt;localStorage.length; i++){
+    var key = localStorage[i];
+    var value = localStorage.getItem(key);
+    localStorage.removeItem(key);
+  }
 
-    localStorage.clear();
-    </pre></li>
-  </ul>
+  localStorage.clear();
+  </pre></div>
 </section>
 
 <section>
@@ -49,14 +47,14 @@
   <ul>
     <li effect="fade">ストレージのデータが更新されたとき window オブジェクトに通知されるイベント</li>
     <li effect="fade">「PUT されたらページを更新」とか</li>
-    <li effect="fade"><pre>
-    window.addEventListener('storage', function(event){
-      console.log(event.key);
-      console.log(event.oldValue);
-      console.log(event.newValue);
-    });
-    </pre></li>
   </ul>
+  <div effect="fade"><pre>
+  window.addEventListener('storage', function(event){
+    console.log(event.key);
+    console.log(event.oldValue);
+    console.log(event.newValue);
+  });
+  </pre></div>
 </section>
 
 <section>
